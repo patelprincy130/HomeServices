@@ -4,14 +4,14 @@ import jwt from "jsonwebtoken"
 import config from "../config.js";
 
 export const signup=async(req,res)=>{
-    const {firstName,lastName,email,password}=req.body;
+    const {firstName,lastName,email,password,houseAddress,serviceType}=req.body;
     try{
         const user=await User.findOne({email:email});
         if(user){
            return res.status(401).json({errors:"User already exists!"});
         }
         const hashPassowrd=await bcrypt.hash(password,10);
-        const newUser=new User({firstName,lastName,email,password:hashPassowrd});
+        const newUser=new User({firstName,lastName,email,password:hashPassowrd,houseAddress,serviceType});
         await newUser.save();
         return res.status(201).json({message:"User signup succeeded"});
     }catch(error){
@@ -24,12 +24,15 @@ export const login=async(req,res)=>{
     const {email,password}=req.body;
     try{
         const user=await User.findOne({email:email});
+        if(!user){
+            return res.status(403).json({errors:"Invalid credentials"});
+        }
         const isPasswordCorrect=await bcrypt.compare(password,user.password);
-        if(!user || !isPasswordCorrect){
+        if(!isPasswordCorrect){
             return res.status(403).json({errors:"Invalid credentials"});
         }
         //jwt
-        const token=jwt.sign({id:user._id},config.JWT_USER_PASSWORD,{expiresIn:"1d"});
+        const token=jwt.sign({id:user._id, email:user.email, fullName:`${user.firstName} ${user.lastName}`},config.JWT_USER_PASSWORD,{expiresIn:"1d"});
         const cookieOptions={
             expires:new Date(Date.now()+24*6*60*1000),
             httpOnly:true,

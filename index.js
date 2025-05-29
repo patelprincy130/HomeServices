@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import userRoute from "./routes/user.route.js";
 import cookieParser from "cookie-parser";
+import protectedRoute from "./routes/protected.route.js";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(cookieParser());
 
 //routes
 app.use("/homeservices/user",userRoute);
+app.use("/api",protectedRoute);
 
 mongoose.connect(mongo_uri)
 .then(()=>console.log("connected to mongoDB"))

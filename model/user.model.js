@@ -16,7 +16,18 @@ const userSchema=new mongoose.Schema({
     password:{
         type:String,
         required:true,
+    },
+    houseAddress:{
+        street:{type:String,required:true},
+        city:{type:String,required:true},
+        postalCode:{type:String,required:true}
+    },
+    serviceType:{
+        type:String,
+        required:true,
+        enum:["Cleaning","Installation","Plumbing","Electrical","Other"],
     }
+    
 });
 
 export const User=mongoose.model("User",userSchema);
